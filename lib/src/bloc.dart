@@ -17,17 +17,19 @@ abstract class Bloc<State, Action> {
   /// Returns the [State] before any [Action]s have been `dispatched`.
   State get initialState;
 
-  /// Returns the current [State] of the [Bloc].
-  State get currentState => _stateSubject.value;
-
   Bloc() {
-    _stateSubject = BehaviorSubject<State>.seeded(initialState);
+    final initial = initialState;
+    assert(null != initial, 'initialState cannot be null');
+    _stateSubject = BehaviorSubject<State>.seeded(initial);
+
+    State currentState = initial;
     transform(
-            _actionsSubject,
-            (Action action) =>
-                Observable<State>(map(action)).handleError(onError))
-        .where((nextState) => currentState != nextState)
-        .forEach(_stateSubject.add);
+        _actionsSubject,
+        (Action action) => Observable<State>(map(currentState, action))
+            .handleError(onError)).forEach((nextState) {
+      currentState = nextState;
+      _stateSubject.add(nextState);
+    });
   }
 
   Sink<Action> get actions => _actionsSubject.sink;
@@ -77,14 +79,12 @@ abstract class Bloc<State, Action> {
   /// }
   /// ```
   Observable<State> transform(
-    Observable<Action> actions,
-    Observable<State> next(Action event)
-  ) =>
+          Observable<Action> actions, Observable<State> next(Action event)) =>
       actions.asyncExpand(next);
 
   /// Takes the incoming `action` as the argument.
   /// `map` is called whenever an [Action] is added by the presentation layer.
   /// `map` must convert that [Action] into a new [State]
   /// and return the new [State] in the form of a [Stream] which is consumed by the presentation layer.
-  Stream<State> map(Action action);
+  Stream<State> map(State state, Action action);
 }
