@@ -31,6 +31,7 @@ abstract class Bloc<State, Action> {
         .forEach(_stateSubject.add);
   }
 
+  @protected
   Sink<Action> get actions => _actionsSubject.sink;
 
   /// Called whenever an [Exception] is thrown within `map`.
