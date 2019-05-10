@@ -34,8 +34,8 @@ class IncrementBloc extends Bloc<int, void> {
   int get initialState => 0;
 
   @override
-  Stream<int> map(int state, void action) async* {
-    yield state + 1;
+  Stream<int> map(void action) async* {
+    yield currentState + 1;
   }
 }
 
@@ -44,5 +44,5 @@ class NullInitialStateBloc extends Bloc<void, void> {
   void get initialState => null;
 
   @override
-  Stream<void> map(void state, void action) async* {}
+  Stream<void> map(void action) async* {}
 }
