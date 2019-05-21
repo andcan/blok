@@ -1,4 +1,5 @@
 import 'package:blok/blok.dart';
+import 'package:rxdart/src/observables/observable.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -34,9 +35,7 @@ class IncrementBloc extends Bloc<int, void> {
   int get initialState => 0;
 
   @override
-  Stream<int> map(void action) async* {
-    yield currentState + 1;
-  }
+  Stream<int> transform(Observable<void> actions) => actions.map((_) => currentState + 1);
 }
 
 class NullInitialStateBloc extends Bloc<void, void> {
@@ -44,5 +43,5 @@ class NullInitialStateBloc extends Bloc<void, void> {
   void get initialState => null;
 
   @override
-  Stream<void> map(void action) async* {}
+  Stream<void> transform(Observable<void> actions) => actions.map<void>(null);
 }
